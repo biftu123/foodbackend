@@ -1,8 +1,16 @@
 const express = require('express');
+const dotenv =require('dotenv')
 const mongoose = require('mongoose');
+
+const categoryRouter = require('./routes/catagoryroute');
+dotenv.config();
 const app = express();
-port= 3001;
-mongoose.connect('mongodb://localhost:27017/food')
+
+const port = process.env.PORT;
+const dbUrl = process.env.DBurl;
+app.use('/category', categoryRouter);
+
+mongoose.connect(dbUrl)
   .then(() => {
     console.log('Connected to MongoDB');
   })

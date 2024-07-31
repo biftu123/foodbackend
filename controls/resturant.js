@@ -8,6 +8,7 @@ exports.addresturant = async (req, res) => {
   try {
     const add = new Restaurant(req.body);
     add.save();
+    res.status(201).json({ message: 'Category created successfully',  });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

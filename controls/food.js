@@ -3,10 +3,7 @@ const Food = require('../models/food');
 
 exports.addfood = async (req, res) => {
     try {
-        const { title, time, code, imageUrl, catagory, description, foodType, foodTags, price, restaurant } = req.body;
-        if (!title || !time || !code || !imageUrl || !catagory || !description || !foodType || !foodTags || !price || !restaurant) {
-            return res.status(400).json({ error: "Missing required fields in the request body." });
-        }
+        
         
         const food = new Food(req.body);
         await food.save();
@@ -69,7 +66,7 @@ exports.getfoodbycatagoryandcode = async (req, res) => {
             { $project: { __v: 0 } }
         ]);
         if (foods.length === 0) {
-            return res.status(200).json([]);
+            return res.status(200).json(foods);
         }
         res.status(200).json(foods);
     } catch (error) {
@@ -102,24 +99,21 @@ exports.getfoodrandombycatagoryandcode = async (req, res) => {
     }
 };
 
-exports.searchfood = async (req, res) => {
-    const search = req.params.search;
+
+exports.search = async (req, res) => {
     try {
-        const result = await Food.aggregate([
-            {
-                $search: {
-                    index: "foods",
-                    text: {
-                        query: search,
-                        path: {
-                            wildcard: "*"
-                        }
-                    }
-                }
-            }
-        ]);
-        res.status(200).json(result);
+      const searchall = await Food.find({
+        $or: [
+          { title: { $regex: req.params.key } },
+          
+          { catagory: { $regex: req.params.key } },
+          { code: { $regex: req.params.key } },
+          { resturant: { $regex: req.params.key } },
+          
+        ],
+      });
+      res.status(200).json(searchall);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};
+  };
